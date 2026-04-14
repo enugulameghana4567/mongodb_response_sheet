@@ -22,7 +22,7 @@ export default function ResponsesPage({ onEdit, onDeleteSuccess, showToast }) {
   const fetchResponses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(API);
+      const res = await axios.get(`${API}/api/responses`); // ✅ Fixed
       setResponses(res.data.data);
     } catch (err) {
       showToast("Failed to load responses", "error");
@@ -35,7 +35,7 @@ export default function ResponsesPage({ onEdit, onDeleteSuccess, showToast }) {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`);
+      await axios.delete(`${API}/api/responses/${id}`); // ✅ Fixed
       setResponses((prev) => prev.filter((r) => r._id !== id));
       setDeleteId(null);
       onDeleteSuccess();
@@ -66,7 +66,6 @@ export default function ResponsesPage({ onEdit, onDeleteSuccess, showToast }) {
 
   return (
     <div className="responses-page">
-      {/* Toolbar */}
       <div className="responses-toolbar">
         <div className="toolbar-left">
           <h2>📊 Response Sheet</h2>
@@ -87,7 +86,6 @@ export default function ResponsesPage({ onEdit, onDeleteSuccess, showToast }) {
         </div>
       </div>
 
-      {/* Table */}
       {loading ? (
         <div className="loading-state">
           <div className="spinner" />
@@ -150,7 +148,6 @@ export default function ResponsesPage({ onEdit, onDeleteSuccess, showToast }) {
         </div>
       )}
 
-      {/* Delete Confirm Modal */}
       {deleteId && (
         <div className="modal-overlay" onClick={() => setDeleteId(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

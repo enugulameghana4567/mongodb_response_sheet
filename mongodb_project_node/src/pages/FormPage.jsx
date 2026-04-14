@@ -62,9 +62,9 @@ export default function FormPage({ editData, onSuccess }) {
     setLoading(true);
     try {
       if (editData?._id) {
-        await axios.put(`${API}/${editData._id}`, form);
+        await axios.put(`${API}/api/responses/${editData._id}`, form); // ✅ Fixed
       } else {
-        await axios.post(API, form);
+        await axios.post(`${API}/api/responses`, form); // ✅ Fixed
       }
       setSubmitted(true);
       setTimeout(() => {
@@ -87,7 +87,6 @@ export default function FormPage({ editData, onSuccess }) {
   return (
     <div className="form-page">
       <div className="form-card">
-        {/* Form Header */}
         <div className="form-header-bar" />
         <div className="form-title-block">
           <h2>{editData ? "✏️ Edit Response" : "Student Information Form"}</h2>
@@ -102,7 +101,6 @@ export default function FormPage({ editData, onSuccess }) {
         )}
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* Name */}
           <div className={`field-group ${errors.name ? "has-error" : ""}`}>
             <label htmlFor="name">Full Name <span className="req">*</span></label>
             <input
@@ -117,7 +115,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.name && <span className="error-msg">{errors.name}</span>}
           </div>
 
-          {/* Gender */}
           <div className={`field-group ${errors.gender ? "has-error" : ""}`}>
             <label>Gender <span className="req">*</span></label>
             <div className="radio-group">
@@ -137,7 +134,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.gender && <span className="error-msg">{errors.gender}</span>}
           </div>
 
-          {/* Studies */}
           <div className={`field-group ${errors.studies ? "has-error" : ""}`}>
             <label htmlFor="studies">Field of Studies <span className="req">*</span></label>
             <input
@@ -151,7 +147,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.studies && <span className="error-msg">{errors.studies}</span>}
           </div>
 
-          {/* Age */}
           <div className={`field-group ${errors.age ? "has-error" : ""}`}>
             <label htmlFor="age">Age <span className="req">*</span></label>
             <input
@@ -167,7 +162,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.age && <span className="error-msg">{errors.age}</span>}
           </div>
 
-          {/* School Name */}
           <div className={`field-group ${errors.schoolName ? "has-error" : ""}`}>
             <label htmlFor="schoolName">School Name <span className="req">*</span></label>
             <input
@@ -181,7 +175,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.schoolName && <span className="error-msg">{errors.schoolName}</span>}
           </div>
 
-          {/* College Name */}
           <div className={`field-group ${errors.collegeName ? "has-error" : ""}`}>
             <label htmlFor="collegeName">College Name <span className="req">*</span></label>
             <input
@@ -195,7 +188,6 @@ export default function FormPage({ editData, onSuccess }) {
             {errors.collegeName && <span className="error-msg">{errors.collegeName}</span>}
           </div>
 
-          {/* Actions */}
           <div className="form-actions">
             <button type="submit" className="btn-submit" disabled={loading}>
               {loading ? "Submitting…" : editData ? "Update Response" : "Submit"}
