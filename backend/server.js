@@ -5,12 +5,12 @@ require("dotenv").config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ Middleware
+app.use(cors()); // or restrict to your Vercel URL
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Schema & Model
+// ✅ Schema & Model
 const responseSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -29,126 +29,42 @@ const responseSchema = new mongoose.Schema(
 
 const Response = mongoose.model("Response", responseSchema);
 
-// Test Route
+// ✅ Test Route
 app.get("/", (req, res) => {
   res.json({ message: "✅ Backend is running!" });
 });
 
-// GET all responses
+// ✅ Routes
 app.get("/api/responses", async (req, res) => {
-  try {
-    const responses = await Response.find().sort({ createdAt: -1 });
-    res.json({ success: true, data: responses });
-  } catch (err) {
-    console.error("❌ GET error:", err.message);
-    res.status(500).json({ success: false, message: err.message });
-  }
+  const responses = await Response.find().sort({ createdAt: -1 });
+  res.json({ success: true, data: responses });
 });
 
-// GET single response
-app.get("/api/responses/:id", async (req, res) => {
-  try {
-    const response = await Response.findById(req.params.id);
-    if (!response) {
-      return res.status(404).json({ success: false, message: "Not found" });
-    }
-    res.json({ success: true, data: response });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// POST - Create new response
 app.post("/api/responses", async (req, res) => {
-  try {
-    const { name, gender, studies, age, schoolName, collegeName } = req.body;
-
-    if (!name || !gender || !studies || !age || !schoolName || !collegeName) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
-    }
-
-    const newResponse = new Response({
-      name,
-      gender,
-      studies,
-      age,
-      schoolName,
-      collegeName,
-    });
-
-    const saved = await newResponse.save();
-
-    res.status(201).json({
-      success: true,
-      data: saved,
-      message: "Response submitted successfully!",
-    });
-  } catch (err) {
-    console.error("❌ POST error:", err.message);
-    res.status(400).json({ success: false, message: err.message });
-  }
+  const newResponse = new Response(req.body);
+  const saved = await newResponse.save();
+  res.status(201).json({ success: true, data: saved });
 });
 
-// PUT - Update response
 app.put("/api/responses/:id", async (req, res) => {
-  try {
-    const updated = await Response.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!updated) {
-      return res.status(404).json({ success: false, message: "Not found" });
-    }
-
-    res.json({
-      success: true,
-      data: updated,
-      message: "Updated successfully!",
-    });
-  } catch (err) {
-    console.error("❌ PUT error:", err.message);
-    res.status(400).json({ success: false, message: err.message });
-  }
+  const updated = await Response.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  res.json({ success: true, data: updated });
 });
 
-// DELETE response
 app.delete("/api/responses/:id", async (req, res) => {
-  try {
-    const deleted = await Response.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: "Not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Deleted successfully!",
-    });
-  } catch (err) {
-    console.error("❌ DELETE error:", err.message);
-    res.status(500).json({ success: false, message: err.message });
-  }
+  await Response.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
 });
 
-// ✅ CONNECT DB FIRST, THEN START SERVER
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-
-    console.log("✅ MongoDB connected successfully");
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
-  }
-};
-
-startServer();
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  })
+  .catch((err) => console.error("❌ DB Error:", err));
