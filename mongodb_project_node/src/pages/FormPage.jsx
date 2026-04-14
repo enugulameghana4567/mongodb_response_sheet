@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "http://localhost:5000/api/responses";
+const API = "https://mongodb-response-sheet.onrender.com";
 
 const initialState = {
   name: "",
